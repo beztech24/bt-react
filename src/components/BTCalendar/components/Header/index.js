@@ -28,8 +28,6 @@ const Header = ({
     <Card
       sx={{
         position: "relative",
-        mt: -8,
-        mx: 3,
         py: 2,
         px: 2,
         maxHeight: height,
