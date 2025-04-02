@@ -16,7 +16,7 @@ import pxToRem from "./functions/pxToRem.js";
 import rgba from "./functions/rgba.js";
 
 // Material Dashboard 2 React components base styles for @mui material components
-// import sidenav from "assets/theme/components/sidenav";
+import sidenav from "./components/sidenav.js";
 // import list from "assets/theme/components/list";
 // import listItem from "assets/theme/components/list/listItem";
 // import listItemText from "assets/theme/components/list/listItemText";
@@ -88,7 +88,7 @@ export default createTheme({
     //     ...container,
     //   },
     // },
-    // MuiDrawer: { ...sidenav },
+    MuiDrawer: { ...sidenav },
     // MuiList: { ...list },
     // MuiListItem: { ...listItem },
     // MuiListItemText: { ...listItemText },
