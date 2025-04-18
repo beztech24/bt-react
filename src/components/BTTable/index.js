@@ -11,8 +11,8 @@ import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+import { TableHead } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
@@ -26,7 +26,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import Collapse from "@mui/material/Collapse";
-
 import { CircularProgress, circularProgressClasses } from "@mui/material";
 import { KeyboardArrowUp, Search as SearchIcon } from "@mui/icons-material";
 import BTTypography from "../BTTypography";
@@ -276,7 +275,6 @@ function MobileRow({
 }) {
   const [open, setOpen] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
-
   const renderCellContent = (row, column, index) => {
     if (column.cell) return column.cell(row, index);
     if (column.selector) return column.selector(row, index);
@@ -320,9 +318,7 @@ function MobileRow({
           scope="row"
           sx={{ width: "50px", fontWeight: "bold" }}
         >
-
           {index + 1}
-
         </TableCell>
         <TableCell
           component="th"
@@ -330,9 +326,7 @@ function MobileRow({
           scope="row"
           sx={{ p: 1, width: "100%" }}
         >
-
           {renderCellContent(row, columns[1], index)}
-
         </TableCell>
         {expandRow && (
           <TableCell
@@ -430,10 +424,6 @@ export default function EnhancedTable({
   loading = false,
   loadingComponent = null,
   sx,
-  checkBoxSelected = false,
-  getRowStyle,
-  globalSearch = true,
-
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -493,18 +483,18 @@ export default function EnhancedTable({
     }
     setSelected([]);
   };
-
   const handleExpandClick = (index) => {
     setExpandedRows((prev) => ({
       ...prev,
       [index]: !prev[index],
-
-  
+    }));
+  };
   const handleSearch = (searchText) => {
     if (!searchText) {
       setFilteredRows(rows || []);
       return;
     }
+
     const lowercasedSearch = searchText.toLowerCase();
     const filtered = rows?.filter((row) => {
       return columns.some((column) => {
@@ -514,7 +504,6 @@ export default function EnhancedTable({
         return String(cellValue).toLowerCase().includes(lowercasedSearch);
       });
     });
-
     setFilteredRows(filtered || []);
     setPage(0);
   };
@@ -540,7 +529,6 @@ export default function EnhancedTable({
   );
 
   return (
-
     <Box sx={sx}>
       <Paper sx={{ width: "100%", mb: 2 }}>
         {tableHeader && (
@@ -736,7 +724,7 @@ export default function EnhancedTable({
 }
 
 EnhancedTable.propTypes = {
-  rows: PropTypes.array.isRequired,
+  rows: PropTypes.array,
   columns: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -768,5 +756,4 @@ EnhancedTable.propTypes = {
   tableHeader: PropTypes.bool,
   loading: PropTypes.bool,
   loadingComponent: PropTypes.node,
-
 };
