@@ -52,7 +52,7 @@ const AppProvider = ({ children }) => {
     sidenavColor: "info",
     transparentNavbar: true,
     fixedNavbar: true,
-    // layout: location.pathname,
+    layout: null,
     isMobile: false,
     darkMode: false,
   };
@@ -72,4 +72,11 @@ const setSideNavWidth = (dispatch, value) =>
 
 const setMiniSidenav = (dispatch, value) =>
   dispatch({ type: "MINI_SIDENAV", value });
-export { AppProvider, useBTUIController, setSideNavWidth, setMiniSidenav };
+const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
+export {
+  AppProvider,
+  useBTUIController,
+  setSideNavWidth,
+  setMiniSidenav,
+  setLayout,
+};

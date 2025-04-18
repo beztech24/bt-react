@@ -1,4 +1,11 @@
-import { AppBar, Toolbar, IconButton } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
+import { useLocation } from "react-router";
 import {
   navbar,
   navbarRow,
@@ -19,7 +26,7 @@ import BTButton from "../../components/BTButton";
 import { Menu, MenuItem } from "@mui/material";
 import { theme_routes } from "../../routes";
 import { NavLink } from "react-router";
-import BTDialogBox from "../../components/BTDialgBox";
+
 const MenuContent = ({ pages, anchorEl, handleMenuClose }) => {
   return (
     <Menu
@@ -74,15 +81,15 @@ const MenuContent = ({ pages, anchorEl, handleMenuClose }) => {
   );
 };
 
-function Dashboardnavbar({ absolute, light, isMini }) {
+function Dashboardnavbar({ absolute, light, sideNavWidth }) {
+  const location = useLocation();
+  const app_routes = theme_routes;
   const [state, dispatch] = useBTUIController();
   const { transparentNavbar, darkMode, fixedNavbar, miniSidenav } = state;
   const [navbarType, setNavbarType] = useState();
   const [anchorEl, setAnchorEl] = useState(null);
   const [currentMenu, setCurrentMenu] = useState(null);
-
-  const [openModel, setModel] = useState(false);
-
+  const isMobile = useMediaQuery("(max-width:1200px)");
   useEffect(() => {
     if (fixedNavbar) {
       setNavbarType("sticky");
@@ -90,11 +97,8 @@ function Dashboardnavbar({ absolute, light, isMini }) {
       setNavbarType("static");
     }
   }, [fixedNavbar]);
-
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
   const handleMenuOpen = (event, menu) => {
-    console.log("menu", menu);
-
     if (menu?.subItems === false) {
       return;
     }
@@ -105,20 +109,23 @@ function Dashboardnavbar({ absolute, light, isMini }) {
     setAnchorEl(null);
     setCurrentMenu(null);
   };
-  const handleClose = () => {
-    setModel(false);
-  };
+
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
       color="inherit"
-      sx={(theme) =>
-        navbar(theme, { transparentNavbar, absolute, light, darkMode })
-      }
+      sx={(theme) => ({
+        ...navbar(theme, { transparentNavbar, absolute, light, darkMode }),
+        left: `${sideNavWidth}px`,
+        transition: theme.transitions.create(["width", "left"], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      })}
     >
       <Toolbar>
-        {isMini ? null : (
-          <BTBox sx={(theme) => navbarRow(theme, { isMini })}>
+        {isMobile && miniSidenav ? (
+          <BTBox sx={(theme) => navbarRow(theme, { isMobile })}>
             <BTBox color={light ? "white" : "inherit"}>
               <IconButton
                 size="small"
@@ -131,28 +138,52 @@ function Dashboardnavbar({ absolute, light, isMini }) {
               </IconButton>
             </BTBox>
           </BTBox>
-        )}
+        ) : null}
 
         {/* Menu content */}
         <BTBox
           sx={{
             flexGrow: 1,
-            width: "600px",
             display: "flex",
             gap: 1,
             overflow: "auto",
-            display: { xs: "none", md: "flex" },
+            display: {
+              xs: "none",
+              sm: "none",
+              lg: "flex",
+              xl: "flex",
+              md: "flex",
+            },
           }}
         >
-          {theme_routes
+          {app_routes
             ?.filter(({ type }) => type === "collapse")
             ?.map((page) => (
               <BTButton
                 key={page?.key}
                 component={!page?.subItems ? NavLink : undefined}
                 to={!page?.subItems ? page?.route : undefined}
-                sx={{ gap: 1, mx: 1, p: 0 }}
+                sx={{
+                  gap: 1,
+                  mx: 1,
+                  p: 0,
+                  borderRadius: 0,
+                  "&.active": {
+                    borderBottom: "1px solid gray",
+                    p: 0,
+                  },
+                  "&:hover": {
+                    borderBottom: "1px solid gray",
+                  },
+                }}
+                className={
+                  location.pathname === page?.route ||
+                  page?.items?.some((item) => location.pathname === item.route)
+                    ? "active"
+                    : ""
+                }
                 onClick={(e) => handleMenuOpen(e, page)}
+                variant={"contained"}
                 aria-controls={
                   currentMenu?.name === page.name ? "basic-menu" : undefined
                 }
@@ -198,41 +229,10 @@ function Dashboardnavbar({ absolute, light, isMini }) {
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
-          <NotificationAdd onClick={() => setModel(true)} />
+          <NotificationAdd />
           <HelpOutlineIcon />
         </BTBox>
       </Toolbar>
-      <BTDialogBox
-        open={openModel}
-        maxWidth="md"
-        // fullWidth
-        width={"500px"}
-        close={handleClose}
-        title="Profile"
-        buttons={[
-          {
-            name: "Cancel",
-            color: "secondary",
-            size: "small",
-            // onClick will automatically use close for "Cancel"
-          },
-          {
-            name: "Save Draft",
-            color: "warning",
-            size: "small",
-            onClick: null,
-          },
-          {
-            name: "Submit",
-            color: "info",
-            size: "small",
-            onClick: null,
-            sx: { ml: 2 }, // additional styling
-          },
-        ]}
-      >
-        Hello Dialog Box
-      </BTDialogBox>
     </AppBar>
   );
 }
