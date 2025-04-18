@@ -1,16 +1,10 @@
 import SidenavRoot from "./SidenavRoot";
 import { NavLink, useLocation } from "react-router";
-import { ListItem, List, IconButton } from "@mui/material";
 import { ArrowForwardIos, ArrowUpward } from "@mui/icons-material";
-import BTBox from "../../components/BTBox";
-import BTTypography from "../../components/BTTypography";
-import BTDivider from "../../components/BTDivider";
-import BTButton from "../../components/BTButton";
 import BTSocialButton from "../../components/BTSocialButton";
-import { NavLink } from "react-router";
 import { ListItem, List, IconButton } from "@mui/material";
-import { ArrowForwardIos } from "@mui/icons-material";
 import BTBox from "../../components/BTBox";
+import BTButton from "../../components/BTButton";
 import BTTypography from "../../components/BTTypography";
 import BTDivider from "../../components/BTDivider";
 import {
@@ -63,7 +57,6 @@ function Sidenav({ color, routes, brandName, ...rest }) {
             icon={icon}
             to={route}
             active={key === collapseName}
-            active={false}
             subItems={subItems}
             items={items}
           />

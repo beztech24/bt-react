@@ -82,11 +82,6 @@ function App() {
           </BTBox>
         </>
       )}
-      <Sidenav
-        brandName={"bezel tech"}
-        onMouseEnter={enterMouse}
-        onMouseLeave={leaveMouse}
-      />
       <Routes>
         {getRoutes(theme_routes)}
         <Route
@@ -99,6 +94,7 @@ function App() {
             )
           }
         />
+      </Routes>
     </ThemeProvider>
   );
 }
