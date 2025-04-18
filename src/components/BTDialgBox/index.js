@@ -4,6 +4,7 @@ import {
   IconButton,
   DialogActions,
   DialogContent,
+  CircularProgress,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import BTBox from "../BTBox";
@@ -46,7 +47,7 @@ function BTDialogBox({ children, close, title, width, buttons = [], ...rest }) {
               sx={button.sx}
               disabled={button.disabled}
             >
-              {button.name}
+              {button.loading ? button.loadingComponent : button.name}
             </BTButton>
           ))}
         </DialogActions>

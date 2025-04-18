@@ -75,6 +75,7 @@ export default styled(Drawer)(({ theme, ownerState }) => {
       boxShadow: xxl,
       border: "none",
       overflowX: "hidden",
+      overflowY: "hidden",
       ...(miniSidenav ? drawerCloseStyles() : drawerOpenStyles()),
     },
   };

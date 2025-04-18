@@ -1,10 +1,12 @@
 import SidenavRoot from "./SidenavRoot";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { ListItem, List, IconButton } from "@mui/material";
-import { ArrowForwardIos } from "@mui/icons-material";
+import { ArrowForwardIos, ArrowUpward } from "@mui/icons-material";
 import BTBox from "../../components/BTBox";
 import BTTypography from "../../components/BTTypography";
 import BTDivider from "../../components/BTDivider";
+import BTButton from "../../components/BTButton";
+import BTSocialButton from "../../components/BTSocialButton";
 import {
   useBTUIController,
   setSideNavWidth,
@@ -13,10 +15,14 @@ import {
 
 import sidenavLogoLabel from "./styles/sidenav";
 import SidenavCollapse from "./sidenavCollapse";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { theme_routes } from "../../routes";
 function Sidenav({ color, routes, brandName, ...rest }) {
   const [state, dispatch] = useBTUIController();
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const collapseName = location.pathname.replace("/", "");
+
   const {
     transparentSidenav,
     whiteSidenav,
@@ -35,7 +41,7 @@ function Sidenav({ color, routes, brandName, ...rest }) {
             name={name}
             icon={icon}
             to={route}
-            // active={true}
+            active={key === collapseName}
             subItems={subItems}
             items={items}
           />
@@ -51,7 +57,7 @@ function Sidenav({ color, routes, brandName, ...rest }) {
             name={name}
             icon={icon}
             to={route}
-            active={false}
+            active={key === collapseName}
             subItems={subItems}
             items={items}
           />
@@ -71,7 +77,7 @@ function Sidenav({ color, routes, brandName, ...rest }) {
   );
   useEffect(() => {
     function handleMiniSidenav() {
-      setMiniSidenav(dispatch, window.innerWidth < 1200);
+      setMiniSidenav(dispatch, window.innerWidth < 1000);
     }
     window.addEventListener("resize", handleMiniSidenav);
     handleMiniSidenav();
@@ -150,7 +156,55 @@ function Sidenav({ color, routes, brandName, ...rest }) {
         </BTBox>
       </BTBox>
       <BTDivider />
-      <List>{renderRoutes}</List>
+      <List sx={{ height: "810px", overflowY: "auto", overflowX: "hidden" }}>
+        {renderRoutes}
+      </List>
+      <BTBox
+        width={"100%"}
+        position="absolute"
+        bottom={0}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+      >
+        <BTBox
+          sx={{
+            p: 1,
+            bgcolor: "transparent",
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            gap: 1,
+            transform: open ? "translateY(0)" : "translateY(140%)",
+            transition: "transform 0.3s ease-in-out",
+          }}
+        >
+          <BTButton fullWidth size="small">
+            profile
+          </BTButton>
+          <BTButton fullWidth size="small">
+            logout
+          </BTButton>
+        </BTBox>
+        <BTSocialButton
+          color="twitter"
+          iconOnly
+          circular
+          variant={"contained"}
+          onClick={() => setOpen(!open)}
+          sx={{ mb: 2 }}
+        >
+          <ArrowUpward
+            sx={(theme) => ({
+              rotate: !open ? "0deg" : "180deg",
+              transition: theme.transitions.create(["rotate"], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.standard,
+              }),
+            })}
+          />
+        </BTSocialButton>
+      </BTBox>
       <div
         style={{
           position: "absolute",

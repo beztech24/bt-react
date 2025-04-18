@@ -1,11 +1,12 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { NavLink } from "react-router";
-import { useState } from "react";
 import BTBox from "../../components/BTBox";
 
 import {
@@ -17,8 +18,11 @@ import {
 import { useBTUIController } from "../../context";
 
 function SidenavCollapse({ icon, name, to, active, subItems, items, ...rest }) {
+  const location = useLocation();
+  const mainroute = location.pathname.split("/")[1];
+  const collapseName = location.pathname;
   const [state] = useBTUIController();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(mainroute === name?.toLowerCase());
   const {
     transparentSidenav,
     whiteSidenav,
@@ -110,7 +114,7 @@ function SidenavCollapse({ icon, name, to, active, subItems, items, ...rest }) {
               icon={item.icon}
               name={item.name}
               to={item.route}
-              active={item.active}
+              active={item.key === collapseName}
               subItems={item?.subItems}
               items={item?.items}
             />

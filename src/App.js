@@ -5,13 +5,13 @@ import { theme_routes } from "./routes";
 import theme from "./assets/theme/index";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import DashboardLayout from "./Layouts/Layoutcontainers";
 import Sidenav from "./Layouts/Sidenav";
+import BTBox from "./components/BTBox";
 import { useBTUIController, setSideNavWidth } from "./context";
-
+import DashboardNavbar from "./Layouts/Dashboardnavbar";
 function App() {
   const [state, dispatch] = useBTUIController();
-  const { sideNavWidth } = state;
+  const { sideNavWidth, layout, miniSidenav } = state;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const enterMouse = () => {
     if (sideNavWidth <= 115 && !onMouseEnter) {
@@ -49,21 +49,53 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Sidenav
-        brandName={"bezel tech"}
-        onMouseEnter={enterMouse}
-        onMouseLeave={leaveMouse}
-      />
+
+      {layout === "dashboard" && (
+        <>
+          <Sidenav
+            brandName={"bezel tech"}
+            onMouseEnter={enterMouse}
+            onMouseLeave={leaveMouse}
+          />
+          <BTBox
+            sx={({ breakpoints, transitions, functions: { pxToRem } }) => ({
+              [breakpoints.up("xl")]: {
+                marginLeft: miniSidenav ? pxToRem(95) : pxToRem(sideNavWidth),
+                transition: transitions.create(["margin-left"], {
+                  easing: transitions.easing.easeInOut,
+                  duration: transitions.duration.shorter,
+                }),
+              },
+              [breakpoints.up("lg")]: {
+                marginLeft: miniSidenav ? pxToRem(95) : pxToRem(sideNavWidth),
+              },
+              [breakpoints.up("sm")]: {
+                marginLeft: miniSidenav ? pxToRem(0) : pxToRem(sideNavWidth),
+              },
+            })}
+          >
+            <DashboardNavbar
+              absolute={false}
+              light={false}
+              isMini={sideNavWidth <= 115}
+              sideNavWidth={sideNavWidth}
+            />
+          </BTBox>
+        </>
+      )}
       <Routes>
         {getRoutes(theme_routes)}
         <Route
           path="*"
           element={
-            false ? <Navigate to="/auth/login" /> : <Navigate to="/buttons" />
+            false ? (
+              <Navigate to="/auth/login" />
+            ) : (
+              <Navigate to="/components/buttons" />
+            )
           }
         />
       </Routes>
-      {/* <DashboardLayout /> */}
     </ThemeProvider>
   );
 }

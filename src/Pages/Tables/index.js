@@ -3,178 +3,213 @@ import EnhancedTable from "../../components/BTTable";
 import DashboardLayout from "../../Layouts/Layoutcontainers";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 const Tables = () => {
-  const rows = [
+  const columns = [
     {
-      id: 1,
-      name: "Cupcakedf dfgdgdfg ffffffffffffffffffffffff sdsds",
-      sur_name: "Mr KKKKKKKK",
-      calories: 305,
-      fat: 3.7,
-      carbs: 67,
-      protein: 4.3,
-      wieght: 2.37478787878787878787878787,
-      status: "active",
+      id: "id",
+      name: "ID",
+      selector: (row, index) => index + 1,
+      width: "50px",
+      numeric: true,
+      sortable: true,
     },
     {
-      id: 2,
-      name: "Donut dfsdfsdv dfgdfgdfdfgdf gtfd dddddddddddddddddddddddddddd sdsdsds",
-      sur_name: "Mr JJJ JJJ ",
-      calories: 452,
-      fat: 25.0,
-      carbs: 51,
-      protein: 4.9,
-      wieght: 2.3,
-      status: "rejected",
+      id: "name",
+      name: "Name",
+      cell: (row) =>
+        row.name.length > 20 ? `${row.name.slice(0, 20)}...` : row.name,
+      sortable: true,
+      width: "350px",
     },
     {
-      id: 3,
-      name: "Eclair fgfgfgfg hhhhhhhhhhhhhhhhhhhhhhhh jkjkjk",
-      sur_name: "Mr BBB BBB",
-      calories: 262,
-      fat: 16.0,
-      carbs: 24,
-      protein: 6.0,
-      wieght: 3.14159265358979323846264338,
-      status: "pending",
+      id: "surname",
+      name: "Surname",
+      selector: (row) => row.surname,
+      sortable: true,
+      width: "150px",
     },
     {
-      id: 4,
-      name: "Froyo ghghghgh iiiiiiiiiiiiiiiiiiiiiiii klklkl",
-      sur_name: "Mr GG GGGGGGG HHH GGG",
-      calories: 159,
-      fat: 6.0,
-      carbs: 24,
-      protein: 4.0,
-      wieght: 1.23456789012345678901234567,
-      status: "active",
+      id: "weight",
+      name: "Weight (kg)",
+      selector: (row) => row.weight.toFixed(2),
+      numeric: true,
+      sortable: true,
+      width: "150px",
     },
     {
-      id: 5,
-      name: "Gingerbread jkjkjkjk llllllllllllllllllllllll mnmnmn",
-      sur_name: "Mr DD DDD DFd ",
-      calories: 356,
-      fat: 9.2,
-      carbs: 49,
-      protein: 3.9,
-      wieght: 4.5678901234567890123456789,
-      status: "rejected",
+      id: "height",
+      name: "Height (cm)",
+      selector: (row) => row.height,
+      numeric: true,
+      sortable: true,
+      width: "150px",
     },
     {
-      id: 6,
-      name: "Honeycomb lmlmlmlm nnnnnnnnnnnnnnnnnnnnnnnn opopop",
-      sur_name: "Mr YY Yyy yy ",
-      calories: 408,
-      fat: 3.2,
-      carbs: 87,
-      protein: 6.5,
-      wieght: 2.71828182845904523536028747,
-      status: "pending",
+      id: "age",
+      name: "Age",
+      selector: (row) => row.age,
+      numeric: true,
+      sortable: true,
+      width: "80px",
     },
     {
-      id: 7,
-      name: "Ice Cream nononon pppppppppppppppppppppppp qrqrqr",
-      sur_name: "Mr TT Tt TTT ",
-      calories: 237,
-      fat: 9.3,
-      carbs: 37,
-      protein: 4.1,
-      wieght: 1.61803398874989484820458683,
-      status: "active",
+      id: "gender",
+      name: "Gender",
+      selector: (row) => row.gender,
+      sortable: true,
+      width: "100px",
     },
     {
-      id: 8,
-      name: "Jelly Bean popopop qqqqqqqqqqqqqqqqqqqqqqqq rsrsrs",
-      sur_name: "Mr GG HH jj jJKKK",
-      calories: 375,
-      fat: 0.0,
-      carbs: 94,
-      protein: 0.0,
-      wieght: 0.57721566490153286060651209,
-      status: "rejected",
+      id: "email",
+      name: "Email",
+      cell: (row) =>
+        row.email.length > 25 ? `${row.email.slice(0, 25)}...` : row.email,
+      width: "250px",
     },
     {
-      id: 9,
-      name: "KitKat qrqrqrqr ssssssssssssssssssssssss tututu",
-      calories: 518,
-      fat: 26.0,
-      carbs: 65,
-      protein: 7.0,
-      wieght: 1.41421356237309504880168872,
-      status: "pending",
+      id: "phone",
+      name: "Phone",
+      selector: (row) => row.phone,
+      width: "200px",
     },
     {
-      id: 10,
-      name: "Lollipop rsrsrsrs tttttttttttttttttttttttt uvuvuv",
-      calories: 392,
-      fat: 0.2,
-      carbs: 98,
-      protein: 0.0,
-      wieght: 1.73205080756887729352744634,
-      status: "active",
-    },
-    // Continuing the pattern for 90 more rows...
-    {
-      id: 11,
-      name: "Marshmallow tututut uuuuuuuuuuuuuuuuuuuuuuu vwvwvw",
-      calories: 318,
-      fat: 8.1,
-      carbs: 56,
-      protein: 2.8,
-      wieght: 2.23606797749978969640917366,
-      status: "rejected",
+      id: "address",
+      name: "Address",
+      cell: (row) =>
+        row.address.length > 30
+          ? `${row.address.slice(0, 30)}...`
+          : row.address,
+      width: "250px",
     },
     {
-      id: 12,
-      name: "Nougat uvuvuvu vvvvvvvvvvvvvvvvvvvvvvvv wxwxwx",
-      calories: 437,
-      fat: 19.7,
-      carbs: 62,
-      protein: 5.3,
-      wieght: 2.64575131106459059050161575,
-      status: "pending",
+      id: "city",
+      name: "City",
+      selector: (row) => row.city,
+      sortable: true,
+      width: "150px",
     },
     {
-      id: 13,
-      name: "Oreo vwvwvwv wwwwwwwwwwwwwwwwwwwwwwww xyxyxy",
-      calories: 486,
-      fat: 23.0,
-      carbs: 69,
-      protein: 6.1,
-      wieght: 2.82842712474619009760337744,
-      status: "active",
+      id: "country",
+      name: "Country",
+      selector: (row) => row.country,
+      sortable: true,
+      width: "120px",
     },
     {
-      id: 14,
-      name: "Pie wxwxwxw xxxxxxxxxxxxxxxxxxxxxxxxx yzyzyz",
-      calories: 277,
-      fat: 12.5,
-      carbs: 37,
-      protein: 3.8,
-      wieght: 3.16227766016837933199889354,
-      status: "rejected",
+      id: "status",
+      name: "Status",
+      selector: (row) => row.status,
+      sortable: true,
+      width: "100px",
+      cell: (row) => (
+        <span
+          style={{
+            color:
+              row.status === "active"
+                ? "green"
+                : row.status === "pending"
+                ? "orange"
+                : "red",
+            fontWeight: "bold",
+          }}
+        >
+          {row.status}
+        </span>
+      ),
     },
     {
-      id: 15,
-      name: "Quiche xyxyxyx yyyyyyyyyyyyyyyyyyyyyyyy zzzzzz",
-      calories: 523,
-      fat: 27.3,
-      carbs: 58,
-      protein: 7.4,
-      wieght: 1.2599210498948731647672106,
-      status: "pending",
+      id: "joinedDate",
+      name: "Joined Date",
+      selector: (row) => new Date(row.joinedDate).toLocaleDateString(),
+      sortable: true,
+      width: "120px",
     },
-    // Continuing this pattern up to 100 rows...
     {
-      id: 100,
-      name: "Zeppole zzzzzzz aaaaaaaaaaaaaaaaaaaaaaaa bbbbbb",
-      calories: 412,
-      fat: 18.6,
-      carbs: 53,
-      protein: 5.7,
-      wieght: 2.15443469003188372175929356,
-      status: "active",
+      id: "actions",
+      name: "Actions",
+      cell: (row) => (
+        <IconButton
+          onClick={() => console.log("Action on row:", row)}
+          size="small"
+        >
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+      ),
+      width: "80px",
+      bodyCellStyle: {
+        padding: "0px",
+      },
+      center: true,
     },
   ];
+
+  const generateRandomData = (count) => {
+    const firstNames = [
+      "John",
+      "Jane",
+      "Michael",
+      "Emily",
+      "David",
+      "Sarah",
+      "Robert",
+      "Lisa",
+    ];
+    const lastNames = [
+      "Smith",
+      "Johnson",
+      "Williams",
+      "Brown",
+      "Jones",
+      "Miller",
+      "Davis",
+      "Garcia",
+    ];
+    const cities = [
+      "New York",
+      "Los Angeles",
+      "Chicago",
+      "Houston",
+      "Phoenix",
+      "Philadelphia",
+      "San Antonio",
+      "San Diego",
+    ];
+    const countries = [
+      "USA",
+      "Canada",
+      "UK",
+      "Australia",
+      "Germany",
+      "France",
+      "Japan",
+      "Brazil",
+    ];
+    const statuses = ["active", "pending", "inactive"];
+
+    return Array.from({ length: count }, (_, i) => ({
+      id: i + 1,
+      name: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${
+        lastNames[Math.floor(Math.random() * lastNames.length)]
+      }`,
+      surname: lastNames[Math.floor(Math.random() * lastNames.length)],
+      weight: Math.random() * 100 + 50, // 50-150 kg
+      height: Math.floor(Math.random() * 60) + 140, // 140-200 cm
+      age: Math.floor(Math.random() * 50) + 18, // 18-68 years
+      gender: Math.random() > 0.5 ? "Male" : "Female",
+      email: `user${i + 1}@example.com`,
+      phone: `+1 ${Math.floor(Math.random() * 900000000) + 100000000}`,
+      address: `${Math.floor(Math.random() * 1000) + 1} ${
+        ["Main", "Oak", "Pine", "Maple", "Cedar"][Math.floor(Math.random() * 5)]
+      } St`,
+      city: cities[Math.floor(Math.random() * cities.length)],
+      country: countries[Math.floor(Math.random() * countries.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      joinedDate: new Date(
+        Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 365 * 5)
+      ).toISOString(), // 0-5 years ago
+    }));
+  };
+
+  const rows = generateRandomData(1000); // Generate 100 rows of data
 
   function handleDelete(selectedIds) {
     console.log("Deleting items with IDs:", selectedIds);
@@ -183,111 +218,34 @@ const Tables = () => {
   const ExpandedComponent = ({ row }) => {
     return JSON.stringify(row);
   };
+  const compactStyles = {
+    headerCellStyle: {
+      padding: "8px",
+      fontSize: "0.8125rem",
+    },
+    bodyCellStyle: {
+      padding: "6px",
+      fontSize: "0.8125rem",
+    },
+    headerRowStyle: {
+      height: "20px",
+    },
+    bodyRowStyle: {
+      height: "20px",
+    },
+  };
   return (
     <DashboardLayout>
       <EnhancedTable
         rows={rows}
-        columns={[
-          {
-            id: "id",
-            name: "ID",
-            selector: (row) => row.id,
-            width: "50px",
-            numeric: true,
-            sortable: true,
-          },
-          {
-            id: "name",
-            name: "Name",
-            // width: "200px",
-            cell: (row) =>
-              row.name.length > 20 ? row?.name.slice(0, 21) + "..." : row?.name,
-            numeric: false,
-            sortable: true,
-          },
-          {
-            id: "surname",
-            name: "Surname",
-            selector: (row) => row?.sur_name,
-            sortable: true,
-          },
-          {
-            id: "wieght",
-            name: "Weight",
-            cell: (row) => row?.wieght,
-            numeric: true,
-            // width: "100px",
-            sortable: true,
-          },
-          {
-            id: "calories",
-            name: "Calories",
-            cell: (row) => row?.calories,
-            numeric: true,
-            sortable: true,
-          },
-          {
-            id: "fat",
-            name: "Fat(G)",
-            cell: (row) => row?.fat,
-            numeric: true,
-          },
-          {
-            id: "carbs",
-            name: "Carbs",
-            cell: (row) => row?.carbs,
-            numeric: true,
-            sortable: true,
-          },
-          {
-            id: "protin",
-            name: "protin",
-            cell: (row) => row?.protein,
-            numeric: true,
-          },
-          {
-            id: "status",
-            name: "Status",
-            selector: (row) => row.status,
-            numeric: false,
-            width: "100px",
-          },
-          {
-            id: "action",
-            name: "Action",
-            numeric: false,
-            cell: (row) => (
-              <MoreVertIcon
-                fontSize="15px"
-                onClick={() => {
-                  console.log("row", row);
-                }}
-              />
-            ),
-            width: "100px",
-            center: true,
-          },
-        ]}
+        // loading={true}
+        tableHeader={true}
+        columns={columns}
         title="Nutrition"
         defaultSort="carbs"
         pagination={true}
         onDeleteSelected={handleDelete}
         checkBoxSelected={false}
-        headerCellStyle={{
-          padding: "8px",
-          fontSize: "0.875rem",
-        }}
-        bodyCellStyle={{
-          padding: "8px",
-          fontSize: "0.875rem",
-        }}
-        headerRowStyle={{
-          height: "30px",
-          backgroundColor: "#f5f5f5",
-        }}
-        bodyRowStyle={{
-          height: "20px",
-        }}
         getRowStyle={(row) => {
           if (row.status === "active") {
             return {
@@ -315,6 +273,7 @@ const Tables = () => {
           }
           return {};
         }}
+        compactStyles={compactStyles}
         expandComponent={ExpandedComponent}
         expandRow={true}
       />
