@@ -30,7 +30,6 @@ function DashboardLayout({ children }) {
         },
       })}
     >
-      <DashboardNavbar absolute={false} />
       <BTBox p={2}>{children}</BTBox>
     </BTBox>
   );
