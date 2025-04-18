@@ -1,3 +1,4 @@
+
 import {
   AppBar,
   Toolbar,
@@ -6,6 +7,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useLocation } from "react-router";
+import { AppBar, Toolbar, IconButton } from "@mui/material";
 import {
   navbar,
   navbarRow,
@@ -26,7 +28,7 @@ import BTButton from "../../components/BTButton";
 import { Menu, MenuItem } from "@mui/material";
 import { theme_routes } from "../../routes";
 import { NavLink } from "react-router";
-
+import BTDialogBox from "../../components/BTDialgBox";
 const MenuContent = ({ pages, anchorEl, handleMenuClose }) => {
   return (
     <Menu
@@ -81,6 +83,7 @@ const MenuContent = ({ pages, anchorEl, handleMenuClose }) => {
   );
 };
 
+
 function Dashboardnavbar({ absolute, light, sideNavWidth }) {
   const location = useLocation();
   const app_routes = theme_routes;
@@ -99,6 +102,8 @@ function Dashboardnavbar({ absolute, light, sideNavWidth }) {
   }, [fixedNavbar]);
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
   const handleMenuOpen = (event, menu) => {
+  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
+  const handleMenuOpen = (event, menu) => {
     if (menu?.subItems === false) {
       return;
     }
@@ -108,6 +113,9 @@ function Dashboardnavbar({ absolute, light, sideNavWidth }) {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setCurrentMenu(null);
+  };
+  const handleClose = () => {
+    setModel(false);
   };
 
   return (
@@ -139,7 +147,6 @@ function Dashboardnavbar({ absolute, light, sideNavWidth }) {
             </BTBox>
           </BTBox>
         ) : null}
-
         {/* Menu content */}
         <BTBox
           sx={{
@@ -184,6 +191,8 @@ function Dashboardnavbar({ absolute, light, sideNavWidth }) {
                 }
                 onClick={(e) => handleMenuOpen(e, page)}
                 variant={"contained"}
+                sx={{ gap: 1, mx: 1, p: 0 }}
+                onClick={(e) => handleMenuOpen(e, page)}
                 aria-controls={
                   currentMenu?.name === page.name ? "basic-menu" : undefined
                 }

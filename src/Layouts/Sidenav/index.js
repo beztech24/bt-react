@@ -7,6 +7,12 @@ import BTTypography from "../../components/BTTypography";
 import BTDivider from "../../components/BTDivider";
 import BTButton from "../../components/BTButton";
 import BTSocialButton from "../../components/BTSocialButton";
+import { NavLink } from "react-router";
+import { ListItem, List, IconButton } from "@mui/material";
+import { ArrowForwardIos } from "@mui/icons-material";
+import BTBox from "../../components/BTBox";
+import BTTypography from "../../components/BTTypography";
+import BTDivider from "../../components/BTDivider";
 import {
   useBTUIController,
   setSideNavWidth,
@@ -22,7 +28,6 @@ function Sidenav({ color, routes, brandName, ...rest }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
-
   const {
     transparentSidenav,
     whiteSidenav,
@@ -58,6 +63,7 @@ function Sidenav({ color, routes, brandName, ...rest }) {
             icon={icon}
             to={route}
             active={key === collapseName}
+            active={false}
             subItems={subItems}
             items={items}
           />
@@ -156,6 +162,7 @@ function Sidenav({ color, routes, brandName, ...rest }) {
         </BTBox>
       </BTBox>
       <BTDivider />
+
       <List sx={{ height: "810px", overflowY: "auto", overflowX: "hidden" }}>
         {renderRoutes}
       </List>

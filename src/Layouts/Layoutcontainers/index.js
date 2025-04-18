@@ -21,6 +21,7 @@ function DashboardLayout({ children }) {
             duration: transitions.duration.shorter,
           }),
         },
+
         [breakpoints.up("lg")]: {
           marginLeft: miniSidenav ? pxToRem(95) : pxToRem(sideNavWidth),
         },
@@ -29,6 +30,7 @@ function DashboardLayout({ children }) {
         },
       })}
     >
+      <DashboardNavbar absolute={false} />
       <BTBox p={2}>{children}</BTBox>
     </BTBox>
   );

@@ -1,3 +1,4 @@
+
 import SignIn from "./authentication/sign-in";
 import SignUp from "./authentication/sign-up";
 import Home from "./Pages/Home";
@@ -15,6 +16,8 @@ import {
   Dashboard as Dash,
   Home as Homepage,
   Login,
+  Person,
+  AppBlockingOutlined,
 } from "@mui/icons-material";
 import Image1 from "./assets/images/Untitled design.png";
 import Avatar from "./Pages/Avatar";
@@ -101,12 +104,12 @@ export const theme_routes = [
     key: "components",
     icon: <Homepage />,
     route: "/components",
-    component: <h1>Home</h1>,
     subItems: true,
     items: [
       {
         type: "collapse",
         name: "Buttons",
+
         key: "/components/buttons",
         icon: "B",
         route: "/components/buttons",
@@ -170,6 +173,7 @@ export const theme_routes = [
       {
         type: "collapse",
         name: "Avatar",
+
         key: "/components/avatar",
         icon: "A",
         route: "/components/avatar",

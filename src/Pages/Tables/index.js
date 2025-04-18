@@ -210,7 +210,7 @@ const Tables = () => {
   };
 
   const rows = generateRandomData(1000); // Generate 100 rows of data
-
+ 
   function handleDelete(selectedIds) {
     console.log("Deleting items with IDs:", selectedIds);
     // Your delete logic here

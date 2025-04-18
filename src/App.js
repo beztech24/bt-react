@@ -49,7 +49,6 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
       {layout === "dashboard" && (
         <>
           <Sidenav
@@ -83,6 +82,11 @@ function App() {
           </BTBox>
         </>
       )}
+      <Sidenav
+        brandName={"bezel tech"}
+        onMouseEnter={enterMouse}
+        onMouseLeave={leaveMouse}
+      />
       <Routes>
         {getRoutes(theme_routes)}
         <Route
@@ -95,7 +99,6 @@ function App() {
             )
           }
         />
-      </Routes>
     </ThemeProvider>
   );
 }
