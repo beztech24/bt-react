@@ -1,4 +1,3 @@
-
 import SignIn from "./authentication/sign-in";
 import SignUp from "./authentication/sign-up";
 import Home from "./Pages/Home";
@@ -10,6 +9,7 @@ import Inputs from "./Pages/Inputs";
 import Dropzone from "./Pages/Dropzone";
 import Badges from "./Pages/Badges";
 import Notifications from "./Pages/Notifications";
+import Charts from "./Pages/Charts";
 import {
   Settings,
   Logout,
@@ -18,6 +18,7 @@ import {
   Login,
   Person,
   AppBlockingOutlined,
+  BarChart,
 } from "@mui/icons-material";
 import Image1 from "./assets/images/Untitled design.png";
 import Avatar from "./Pages/Avatar";
@@ -206,6 +207,15 @@ export const theme_routes = [
         route: "/components/notification",
         subItems: false,
         component: <Notifications />,
+      },
+      {
+        type: "collapse",
+        name: "Charts",
+        key: "/components/charts",
+        icon: <BarChart />,
+        route: "/components/charts",
+        subItems: false,
+        component: <Charts />,
       },
     ],
   },
