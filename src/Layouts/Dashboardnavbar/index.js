@@ -113,14 +113,14 @@ function Dashboardnavbar({ absolute, light, sideNavWidth }) {
     <AppBar
       position={absolute ? "absolute" : navbarType}
       color="inherit"
-      sx={(theme) => ({
-        ...navbar(theme, { transparentNavbar, absolute, light, darkMode }),
-        left: `${sideNavWidth}px`,
-        transition: theme.transitions.create(["width", "left"], {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      })}
+      // sx={(theme) => ({
+      //   ...navbar(theme, { transparentNavbar, absolute, light, darkMode }),
+      //   left: `${sideNavWidth}px`,
+      //   transition: theme.transitions.create(["width", "left"], {
+      //     easing: theme.transitions.easing.sharp,
+      //     duration: theme.transitions.duration.enteringScreen,
+      //   }),
+      // })}
     >
       <Toolbar>
         {isMobile && miniSidenav ? (
