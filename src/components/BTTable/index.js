@@ -1,34 +1,48 @@
 import * as React from "react";
 import PropTypes from "prop-types";
+import { useEffect } from "react";
 import {
   alpha,
   useMediaQuery,
   useTheme,
   styled,
   InputBase,
+  ButtonGroup,
 } from "@mui/material";
-import Box from "@mui/material/Box";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import { TableHead } from "@mui/material";
-import TableContainer from "@mui/material/TableContainer";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableContainer,
+  TablePagination,
+  TableRow,
+  TableSortLabel,
+  Toolbar,
+  Typography,
+  Menu,
+  MenuItem,
+  ListItemText,
+  Checkbox,
+  IconButton,
+  Paper,
+  Tooltip,
+  Collapse,
+  CircularProgress,
+  circularProgressClasses,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import { PictureAsPdf, Description, FilterList } from "@mui/icons-material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import { visuallyHidden } from "@mui/utils";
-import Collapse from "@mui/material/Collapse";
-import { CircularProgress, circularProgressClasses } from "@mui/material";
 import { KeyboardArrowUp, Search as SearchIcon } from "@mui/icons-material";
 import BTTypography from "../BTTypography";
+import { jsPDF } from "jspdf";
+import { applyPlugin } from "jspdf-autotable";
+import * as XLSX from "xlsx";
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -59,16 +73,6 @@ const Search = styled("div")(({ theme }) => ({
   },
   transition: theme.transitions.create("width"),
   overflow: "hidden",
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -173,19 +177,43 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, title, onDelete, onSearch, globalSearch } = props;
+  const {
+    numSelected,
+    title,
+    onDelete,
+    onSearch,
+    globalSearch,
+    onExportPDF,
+    onExportExcel,
+    columns,
+    onToggleColumn,
+    visibleColumns,
+  } = props;
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [searchText, setSearchText] = React.useState("");
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const handleSearchChange = (event) => {
     setSearchText(event.target.value);
     onSearch(event.target.value);
+  };
+  const handleColumnToggle = (columnId) => (event) => {
+    event.stopPropagation();
+    onToggleColumn(columnId);
   };
   return (
     <Toolbar
       sx={[
         {
           pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
+          pr: { xs: 1, sm: 2 },
         },
         numSelected > 0 && {
           bgcolor: (theme) =>
@@ -200,7 +228,7 @@ function EnhancedTableToolbar(props) {
         <Typography
           sx={{ flex: "1 1 100%" }}
           color="inherit"
-          variant="subtitle1"
+          variant="button"
           component="div"
         >
           {numSelected} selected
@@ -218,35 +246,106 @@ function EnhancedTableToolbar(props) {
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton onClick={onDelete}>
-            <DeleteIcon />
+            <DeleteIcon color="error" />
           </IconButton>
         </Tooltip>
       ) : (
-        globalSearch && (
-          <Box display={"flex"}>
-            {searchOpen && (
-              <Search>
-                <SearchIconWrapper>
+        <Box display={"flex"} alignItems={"center"}>
+          {searchOpen && (
+            <Search>
+              <StyledInputBase
+                placeholder="Search..."
+                inputProps={{ "aria-label": "search" }}
+                value={searchText}
+                onChange={handleSearchChange}
+                autoFocus
+                onBlur={() => searchText === "" && setSearchOpen(false)}
+              />
+            </Search>
+          )}
+          <ButtonGroup
+            variant="contained"
+            size="small"
+            sx={{ ml: 1, height: "30px", boxShadow: "none" }}
+            color="dark"
+          >
+            {globalSearch && (
+              <Tooltip title="Filter list">
+                <IconButton onClick={(e) => setSearchOpen(!searchOpen)}>
                   <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search..."
-                  inputProps={{ "aria-label": "search" }}
-                  value={searchText}
-                  onChange={handleSearchChange}
-                  autoFocus
-                  onBlur={() => searchText === "" && setSearchOpen(false)}
-                />
-              </Search>
+                </IconButton>
+              </Tooltip>
             )}
-            <Tooltip title="Filter list">
-              <IconButton onClick={(e) => setSearchOpen(!searchOpen)}>
-                <FilterListIcon />
+            <Tooltip title="Export as PDF">
+              <IconButton onClick={onExportPDF}>
+                <PictureAsPdf />
               </IconButton>
             </Tooltip>
-          </Box>
-        )
+            <Tooltip title="Export as Excel">
+              <IconButton onClick={onExportExcel}>
+                <Description />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Visible Columns">
+              <IconButton
+                aria-controls={open ? "demo-customized-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                size="small"
+                onClick={handleClick}
+                endIcon={<KeyboardArrowDownIcon />}
+              >
+                <FilterList />
+              </IconButton>
+            </Tooltip>
+          </ButtonGroup>
+        </Box>
       )}
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+        PaperProps={{
+          style: {
+            maxHeight: 400,
+            width: 200,
+          },
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          sx={{ px: 2, py: 1, fontWeight: "bold" }}
+        >
+          Visible Columns
+        </Typography>
+        {columns.map((column) => (
+          <MenuItem
+            key={column.id}
+            dense
+            onClick={handleColumnToggle(column.id)}
+          >
+            <Checkbox
+              checked={visibleColumns.includes(column.id)}
+              onChange={() => handleColumnToggle(column.id)}
+              color="secondary"
+              size="small"
+              sx={{ py: 0 }}
+            />
+            <ListItemText
+              primary={column.name || column.label || column.id}
+              sx={{
+                "& .css-1236rad-MuiTypography-root": {
+                  fontSize: "14px",
+                },
+              }}
+            />
+          </MenuItem>
+        ))}
+      </Menu>
     </Toolbar>
   );
 }
@@ -257,6 +356,9 @@ EnhancedTableToolbar.propTypes = {
   onDelete: PropTypes.func,
   onSearch: PropTypes.func,
   globalSearch: PropTypes.bool,
+  columns: PropTypes.array.isRequired,
+  onToggleColumn: PropTypes.func.isRequired,
+  visibleColumns: PropTypes.array.isRequired,
 };
 
 function MobileRow({
@@ -272,15 +374,17 @@ function MobileRow({
   checkBoxSelected,
   expandRow,
   expandComponent,
+  page,
+  rowsPerPage,
 }) {
   const [open, setOpen] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
+  const globalIndex = page * rowsPerPage + index;
   const renderCellContent = (row, column, index) => {
     if (column.cell) return column.cell(row, index);
     if (column.selector) return column.selector(row, index);
     return row[column.id];
   };
-
   return (
     <>
       <TableRow
@@ -318,7 +422,7 @@ function MobileRow({
           scope="row"
           sx={{ width: "50px", fontWeight: "bold" }}
         >
-          {index + 1}
+          {globalIndex + 1}
         </TableCell>
         <TableCell
           component="th"
@@ -403,7 +507,58 @@ MobileRow.propTypes = {
   expandRow: PropTypes.bool,
   expandComponent: PropTypes.func,
 };
+function CustomPaginationActions(props) {
+  const { count, page, rowsPerPage, onPageChange } = props;
 
+  const handleFirstPageButtonClick = (event) => {
+    onPageChange(event, 0);
+  };
+
+  const handleBackButtonClick = (event) => {
+    onPageChange(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event) => {
+    onPageChange(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event) => {
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        <KeyboardDoubleArrowLeftIcon />
+      </IconButton>
+      <IconButton
+        onClick={handleBackButtonClick}
+        disabled={page === 0}
+        aria-label="previous page"
+      >
+        <KeyboardArrowUp style={{ transform: "rotate(-90deg)" }} />
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        <KeyboardArrowUp style={{ transform: "rotate(90deg)" }} />
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        <KeyboardDoubleArrowLeftIcon style={{ transform: "rotate(-180deg)" }} />
+      </IconButton>
+    </Box>
+  );
+}
 export default function EnhancedTable({
   rows = [],
   columns = [],
@@ -414,10 +569,25 @@ export default function EnhancedTable({
   defaultSort = "calories",
   defaultOrder = "asc",
   pagination = true,
-  rowsPerPageOptions = [5, 10, 15],
-  defaultRowsPerPage = 5,
+  rowsPerPageOptions = [20, 50, 100],
+  defaultRowsPerPage = 20,
   onDeleteSelected,
-  compactStyles = {},
+  compactStyles = {
+    headerCellStyle: {
+      padding: "8px",
+      fontSize: "12px",
+    },
+    bodyCellStyle: {
+      padding: "6px",
+      fontSize: "12px",
+    },
+    headerRowStyle: {
+      height: "20px",
+    },
+    bodyRowStyle: {
+      height: "20px",
+    },
+  },
   checkBoxSelected = false,
   getRowStyle,
   globalSearch = true,
@@ -433,16 +603,192 @@ export default function EnhancedTable({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(defaultRowsPerPage);
   const [expandedRows, setExpandedRows] = React.useState({});
-  const [filteredRows, setFilteredRows] = React.useState(rows || []);
+  const [visibleColumns, setVisibleColumns] = React.useState(
+    columns.map((col) => col.id)
+  );
+  const [searchText, setSearchText] = React.useState("");
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
+  const toggleColumn = (columnId) => {
+    setVisibleColumns((prev) =>
+      prev.includes(columnId)
+        ? prev.filter((id) => id !== columnId)
+        : [...prev, columnId]
+    );
+  };
+  const filteredColumns = columns.filter((col) =>
+    visibleColumns.includes(col.id)
+  );
 
+  const exportToPDF = () => {
+    applyPlugin(jsPDF);
+    try {
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const tableTitle = title || "Table";
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 14; // Left and right margin in mm
+      const availableWidth = pageWidth - margin * 2;
+
+      // Prepare data for export
+      const exportData = filteredRows.map((row) => {
+        return columns.map((column) => {
+          let computedValue;
+
+          if (column?.value) {
+            computedValue = column.value(row);
+          } else if (column.selector) {
+            computedValue = column.selector(row);
+          } else if (column.cell) {
+            computedValue = column.cell(row);
+          } else {
+            computedValue = row[column.id];
+          }
+
+          return computedValue != null ? String(computedValue) : "";
+        });
+      });
+
+      const headers = filteredColumns.map(
+        (column) => column.name || column.label || column.id
+      );
+
+      // Calculate column widths
+      const columnCount = headers.length;
+      let columnWidths = [];
+
+      if (columnCount > 0) {
+        // Option 1: Equal distribution
+        // columnWidths = new Array(columnCount).fill(availableWidth / columnCount);
+
+        // Option 2: Content-based width calculation
+        columnWidths = headers.map((header, colIndex) => {
+          // Get all cell values for this column
+          const columnValues = exportData.map((row) => row[colIndex]);
+          // Include header in width calculation
+          const allValues = [header, ...columnValues];
+
+          // Find longest text in the column
+          const longestText = allValues.reduce((a, b) =>
+            a.length > b.length ? a : b
+          );
+
+          // Calculate width based on text length (adjust multiplier as needed)
+          const baseWidth = longestText.length * 1.5;
+          // Ensure minimum and maximum widths
+          return Math.min(Math.max(baseWidth, 20), availableWidth / 2);
+        });
+
+        // Normalize widths to fit available space
+        const totalCalculatedWidth = columnWidths.reduce((a, b) => a + b, 0);
+        const scaleFactor = availableWidth / totalCalculatedWidth;
+        columnWidths = columnWidths.map((width) => width * scaleFactor);
+      }
+
+      // Add title
+      doc.text(tableTitle, margin, 15);
+
+      // Generate table with dynamic column widths
+      doc.autoTable({
+        head: [headers],
+        body: exportData,
+        startY: 20,
+        margin: { left: margin, right: margin },
+        styles: {
+          fontSize: 8,
+          overflow: "linebreak",
+          valign: "middle",
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: "bold",
+        },
+        columnStyles: columnWidths.reduce((styles, width, index) => {
+          styles[index] = { cellWidth: width };
+          return styles;
+        }, {}),
+        tableWidth: "auto",
+        pageBreak: "auto",
+      });
+
+      // Save the PDF
+      doc.save(
+        `${tableTitle.replace(/\s+/g, "_")}_${new Date()
+          .toISOString()
+          .slice(0, 10)}.pdf`
+      );
+    } catch (error) {
+      alert(`Error generating PDF. Please try again.${error}`);
+    }
+  };
+
+  const exportToExcel = () => {
+    const tableTitle = title || "Table";
+    // Prepare data for export
+    const headers = filteredColumns.map((column) => ({
+      header: column.name || column.label || column.id,
+      key: column.id,
+    }));
+
+    // Create an array of objects with the correct structure
+    const exportData = filteredRows.map((row) => {
+      const rowData = {};
+      columns.forEach((column) => {
+        const key = column.id;
+
+        // Priority 1: column.value (if it's a function)
+        if (column?.value) {
+          rowData[key] = column.value(row);
+        }
+        // Priority 2: column.selector
+        else if (column.selector) {
+          rowData[key] = column.selector(row);
+        }
+        // Priority 3: column.cell
+        else if (column.cell) {
+          rowData[key] = column.cell(row);
+        }
+        // Priority 4: row[column.id] (fallback)
+        else {
+          rowData[key] = row[column.id];
+        }
+
+        // Ensure null/undefined becomes an empty string (optional)
+        if (rowData[key] == null) {
+          rowData[key] = "";
+        }
+      });
+      return rowData;
+    });
+    // Create worksheet with headers
+    const worksheet = XLSX.utils.json_to_sheet(exportData, {
+      header: headers.map((h) => h.key), // Use the column ids as keys
+    });
+    // If you want to customize the header names in Excel
+    XLSX.utils.sheet_add_aoa(worksheet, [headers.map((h) => h.header)], {
+      origin: "A1",
+    });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(
+      workbook,
+      `${tableTitle.replace(/\s+/g, "_")}_${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`
+    );
+  };
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
+      const newSelected = rows.map((n) => n);
       setSelected(newSelected);
       return;
     }
@@ -489,41 +835,34 @@ export default function EnhancedTable({
       [index]: !prev[index],
     }));
   };
-  const handleSearch = (searchText) => {
-    if (!searchText) {
-      setFilteredRows(rows || []);
-      return;
-    }
 
-    const lowercasedSearch = searchText.toLowerCase();
-    const filtered = rows?.filter((row) => {
-      return columns.some((column) => {
-        const cellValue = column.selector
-          ? column.selector(row)
-          : row[column.id];
-        return String(cellValue).toLowerCase().includes(lowercasedSearch);
-      });
+  const lowercasedSearch = searchText?.toLowerCase();
+
+  const filteredRows = rows?.filter((row) => {
+    return columns.some((column) => {
+      const cellValue = column.selector ? column.selector(row) : row[column.id];
+      return String(cellValue).toLowerCase().includes(lowercasedSearch);
     });
-    setFilteredRows(filtered || []);
-    setPage(0);
-  };
-  const renderCellContent = (row, column, index) => {
-    if (column.cell) return column.cell(row, index);
-    if (column.selector) return column.selector(row, index);
-  };
-  React.useEffect(() => {
-    if (rows) {
-      setFilteredRows(rows);
-    }
-  }, [rows]);
+  });
 
+  const renderCellContent = (row, column, index) => {
+    const globalIndex = page * rowsPerPage + index;
+    if (column.cell) return column.cell(row, globalIndex);
+    if (column.selector) return column.selector(row, globalIndex);
+    return row[column.id];
+  };
+  useEffect(() => {
+    if (searchText?.length > 0) {
+      setPage(0);
+    }
+  }, [searchText]);
   const visibleRows = React.useMemo(
     () =>
-      [...filteredRows]
+      [...(filteredRows || [])]
         .sort(getComparator(order, orderBy))
         .slice(
           pagination ? page * rowsPerPage : 0,
-          pagination ? page * rowsPerPage + rowsPerPage : rows.length
+          pagination ? page * rowsPerPage + rowsPerPage : filteredRows?.length
         ),
     [order, orderBy, page, rowsPerPage, filteredRows, pagination]
   );
@@ -536,8 +875,13 @@ export default function EnhancedTable({
             numSelected={selected.length}
             title={title}
             onDelete={handleDeleteSelected}
-            onSearch={handleSearch}
+            onSearch={setSearchText}
             globalSearch={globalSearch}
+            onExportPDF={exportToPDF}
+            onExportExcel={exportToExcel}
+            columns={columns}
+            onToggleColumn={toggleColumn}
+            visibleColumns={visibleColumns}
           />
         )}
         {loading ? (
@@ -568,12 +912,11 @@ export default function EnhancedTable({
             No data available
           </BTTypography>
         ) : (
-          <TableContainer sx={{ maxHeight: 700 }}>
+          <TableContainer sx={{ maxHeight: 700, pl: 2, pr: 2 }}>
             <Table
               aria-labelledby="tableTitle"
               size="small"
               aria-label="a dense table"
-              sx={{ overflow: "hidden" }}
               stickyHeader
             >
               {!isMobile && (
@@ -584,7 +927,7 @@ export default function EnhancedTable({
                   onSelectAllClick={handleSelectAllClick}
                   onRequestSort={handleRequestSort}
                   rowCount={rows.length}
-                  columns={columns}
+                  columns={filteredColumns}
                   headerCellStyle={compactStyles?.headerCellStyle}
                   headerRowStyle={compactStyles?.headerRowStyle}
                   checkBoxSelected={checkBoxSelected}
@@ -593,13 +936,15 @@ export default function EnhancedTable({
               )}
               <TableBody>
                 {visibleRows.map((row, index) => {
-                  const isItemSelected = selected.includes(row.id);
+                  const isItemSelected = selected.includes(row);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   const isExpanded = expandedRows[index] || false;
                   return isMobile ? (
                     <MobileRow
                       key={index}
                       index={index}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
                       row={row}
                       columns={columns}
                       isItemSelected={isItemSelected}
@@ -631,7 +976,7 @@ export default function EnhancedTable({
                             <Checkbox
                               color="primary"
                               checked={isItemSelected}
-                              onClick={(e) => handleClick(e, row?.id)}
+                              onClick={(e) => handleClick(e, row)}
                               inputProps={{
                                 "aria-labelledby": labelId,
                               }}
@@ -661,7 +1006,7 @@ export default function EnhancedTable({
                             </IconButton>
                           </TableCell>
                         )}
-                        {columns.map((column) => (
+                        {filteredColumns.map((column) => (
                           <TableCell
                             key={column.id}
                             component="th"
@@ -689,6 +1034,7 @@ export default function EnhancedTable({
                       {expandRow && isExpanded && (
                         <TableRow>
                           <TableCell
+                            sx={{ p: 0 }}
                             colSpan={
                               columns.length +
                               (checkBoxSelected ? 1 : 0) +
@@ -706,16 +1052,33 @@ export default function EnhancedTable({
             </Table>
           </TableContainer>
         )}
-
         {pagination && Array.isArray(rows) && rows.length > 0 && (
           <TablePagination
-            rowsPerPageOptions={rowsPerPageOptions}
             component="div"
-            count={rows.length}
+            rowsPerPageOptions={rowsPerPageOptions}
+            count={filteredRows.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            ActionsComponent={CustomPaginationActions} // Use custom actions
+            sx={{
+              "& .MuiTablePagination-toolbar": {
+                minHeight: "30px",
+                padding: "0 8px",
+              },
+              "& .MuiTablePagination-selectLabel": { fontSize: "0.90rem" },
+              "& .MuiTablePagination-displayedRows": { fontSize: "0.90rem" },
+              "& .MuiInputBase-root": { fontSize: "0.90rem" },
+              "& .MuiMenuItem-root": { fontSize: "0.90rem", minHeight: "32px" },
+            }}
+            SelectProps={{
+              MenuProps: {
+                PaperProps: {
+                  sx: { "& .MuiMenuItem-root": { fontSize: "0.90rem" } },
+                },
+              },
+            }}
           />
         )}
       </Paper>
